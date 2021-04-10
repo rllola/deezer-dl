@@ -2,7 +2,9 @@
 
 Download music directly from deezer.
 
-You will need a file `settings.ini` file.
+You will need a file `settings.ini` file in your `~/.config/deezer-dl`.
+
+Only works for linux. Don't hesitate to open an issue for any feature request.
 
 ```ini
 ;;; base config
@@ -25,5 +27,26 @@ music_dir = /tmp/deezer-dl
 ## Install
 
 ```
-$ make install
+$ pip install --user https://github.com/rllola/deezer-dl.git
 ```
+
+## Feature
+
+```
+usage: deezer-dl [-h] {check,download} ...
+
+optional arguments:
+  -h, --help        show this help message and exit
+
+command:
+  
+      check      Verify Deezer login.
+      download   Download favorites.    
+      
+
+  {check,download}
+```
+
+## Acknowledgement
+
+Thanks to kmile hardwork see : https://github.com/kmille/deezer-downloader
