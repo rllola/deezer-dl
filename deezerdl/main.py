@@ -22,8 +22,8 @@ def main():
     args = parser.parse_args()
 
     if args.command:
-        from deezer import config, test_deezer_login, get_song_infos_from_deezer_website, download_song, get_deezer_favorites, TYPE_TRACK
-        from utils import format_song_filename
+        from deezer.deezer import config, test_deezer_login, get_song_infos_from_deezer_website, download_song, get_deezer_favorites, TYPE_TRACK
+        from deezer.utils import format_song_filename
 
         if args.command == 'check':
             test_deezer_login()

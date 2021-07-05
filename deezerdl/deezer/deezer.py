@@ -5,8 +5,8 @@ import re
 import json
 from typing import Optional, Sequence
 
-from configuration import config
-from crypto import md5hex, hexaescrypt, calcbfkey, decryptfile
+from .configuration import config
+from .crypto import md5hex, hexaescrypt, calcbfkey, decryptfile
 
 import struct
 import urllib.parse
