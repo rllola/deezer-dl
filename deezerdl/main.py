@@ -38,7 +38,8 @@ def main():
                     song_info = get_song_infos_from_deezer_website(TYPE_TRACK, song_id)
                     song_filename = format_song_filename(song_info['ART_NAME'],song_info['SNG_TITLE'])
                     song_path = os.path.join(config['deezer']['music_dir'], song_filename)
-                    if os.path.exists(song_path):
+                    # We only support FLAC and MP3
+                    if os.path.exists(song_path+'.flac') or os.path.exists(song_path+'.mp3'):
                         continue
                     download_song(song_info, song_path)            
                 except Exception as e:
