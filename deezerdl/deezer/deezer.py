@@ -272,16 +272,38 @@ def download_song(song, output_file):
     assert type(song) == dict, "song must be a dict"
     assert type(output_file) == str, "output_file must be a str"
 
-    song_quality = 9 if song.get("FILESIZE_FLAC") and config['deezer'].getboolean('flac_quality') else \
-                   3 if song.get("FILESIZE_MP3_320") else \
-                   5 if song.get("FILESIZE_MP3_256") else \
+    song_quality = 9 if int(song.get("FILESIZE_FLAC")) and config['deezer'].getboolean('flac_quality') else \
+                   3 if int(song.get("FILESIZE_MP3_320")) else \
+                   5 if int(song.get("FILESIZE_MP3_256")) else \
                    1
 
     urlkey = genurlkey(song["SNG_ID"], song["MD5_ORIGIN"], song["MEDIA_VERSION"], song_quality)
     key = calcbfkey(song["SNG_ID"])
     try:
         url = "https://e-cdns-proxy-%s.dzcdn.net/mobile/1/%s" % (song["MD5_ORIGIN"][0], urlkey.decode())
-        fh = session.get(url)
+        fh = requests.get(url)
+
+        # Sometimes it is because we asked for a song quality that is actually not available
+        if fh.status_code == 403:
+            if song.get("FALLBACK"):
+                song = song.get("FALLBACK")
+                song_quality = 9 if int(song.get("FILESIZE_FLAC")) and config['deezer'].getboolean('flac_quality') else \
+                   3 if int(song.get("FILESIZE_MP3_320")) else \
+                   5 if int(song.get("FILESIZE_MP3_256")) else \
+                   1
+            else:
+                song_quality = 1
+            urlkey = genurlkey(song["SNG_ID"], song["MD5_ORIGIN"], song["MEDIA_VERSION"], song_quality)
+            url = "https://e-cdns-proxy-%s.dzcdn.net/mobile/1/%s" % (song["MD5_ORIGIN"][0], urlkey.decode())
+            fh = requests.get(url)
+
+        # if song fallback and song quality other than one not available we can attempt song_quality 1 again...
+        if fh.status_code == 403:
+            song_quality = 1
+            urlkey = genurlkey(song["SNG_ID"], song["MD5_ORIGIN"], song["MEDIA_VERSION"], song_quality)
+            url = "https://e-cdns-proxy-%s.dzcdn.net/mobile/1/%s" % (song["MD5_ORIGIN"][0], urlkey.decode())
+            fh = requests.get(url)
+
         if fh.status_code != 200:
             # I don't why this happens. to reproduce:
             # go to https://www.deezer.com/de/playlist/1180748301
@@ -291,6 +313,12 @@ def download_song(song, output_file):
             # but you can play the song in the browser
             print("ERROR: Can not download this song. Got a {}".format(fh.status_code))
             return
+
+        # Properly pick the extension (flac or mp3)
+        if song_quality == 9:
+            output_file = output_file + '.flac'
+        else:
+            output_file = output_file + '.mp3'
 
         with open(output_file, "w+b") as fo:
             # add songcover and DL first 30 sec's that are unencrypted
