@@ -27,7 +27,7 @@ music_dir = /tmp/deezer-dl
 ## Install
 
 ```
-$ pip install --user https://github.com/rllola/deezer-dl.git
+$ pip install -U git+https://github.com/rllola/deezer-dl.git
 ```
 
 ## Feature
